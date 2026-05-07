@@ -1,57 +1,32 @@
-# ARCHIVO: servicio.py
+# ARCHIVO: reserva.py
 
-from abc import ABC, abstractmethod
+from excepciones import ErrorReserva
 
-class Servicio(ABC):
+class Reserva:
     """
-    Clase abstracta para los servicios.
-    """
-
-    def __init__(self, nombre, precio_base):
-        self.nombre = nombre
-        self.precio_base = precio_base
-
-    @abstractmethod
-    def calcular_costo(self):
-        pass
-
-    @abstractmethod
-    def descripcion(self):
-        pass
-
-
-class Sala(Servicio):
-    """
-    Servicio de reserva de salas.
+    Clase que gestiona las reservas.
     """
 
-    def calcular_costo(self, horas=1):
-        return self.precio_base * horas
+    def __init__(self, cliente, servicio, duracion):
+        if duracion <= 0:
+            raise ErrorReserva("Duración inválida")
 
-    def descripcion(self):
-        return "Reserva de sala"
+        self.cliente = cliente
+        self.servicio = servicio
+        self.duracion = duracion
+        self.estado = "Pendiente"
 
+    def confirmar(self):
+        self.estado = "Confirmada"
 
-class Equipo(Servicio):
-    """
-    Servicio de alquiler de equipos.
-    """
+    def cancelar(self):
+        self.estado = "Cancelada"
 
-    def calcular_costo(self, dias=1):
-        return self.precio_base * dias
+    def procesar(self):
+        try:
+            costo = self.servicio.calcular_costo(self.duracion)
+            self.confirmar()
+            return costo
+        except Exception as e:
+            raise ErrorReserva("Error al procesar reserva") from e
 
-    def descripcion(self):
-        return "Alquiler de equipo"
-
-
-class Asesoria(Servicio):
-    """
-    Servicio de asesoría especializada.
-    """
-
-    def calcular_costo(self, horas=1, descuento=0):
-        costo = self.precio_base * horas
-        return costo - (costo * descuento)
-
-    def descripcion(self):
-        return "Asesoría especializada"
